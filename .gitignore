@@ -4,3 +4,4 @@ barbie_extract
 pinames.*
 output/*.wav
 *.wav
+test.bin

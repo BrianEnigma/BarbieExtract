@@ -94,8 +94,6 @@ void extractFiles(std::ifstream &inFile) {
         headerOffset++;
         fileIndex++;
     }
-
-
 }
 
 int main(int argc, char **argv) {
