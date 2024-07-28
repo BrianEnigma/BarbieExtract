@@ -1,0 +1,6 @@
+**/.DS_Store
+**/*.dSYM
+barbie_extract
+pinames.*
+output/*.wav
+*.wav

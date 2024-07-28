@@ -7,6 +7,7 @@
 #include <unistd.h>
 
 #define DEBUG_SEEK false
+#define DEBUG_COPY true
 
 const std::string INPUT_FILE = "pinames.hug";
 
@@ -62,6 +63,8 @@ int findNextHeader(std::ifstream &inFile, int currentOffset) {
 }
 
 void extractFile(std::ifstream &inFile, const char *filename, size_t offset, size_t length) {
+    if (DEBUG_COPY)
+        std::cout << "Copying from 0x" << std::hex << offset << std::dec << ", length " << length << std::endl;
     std::ofstream outFile(filename, std::ios::binary | std::ios::out);
     inFile.seekg(offset);
     while (length > 0) {
@@ -79,16 +82,17 @@ void extractFiles(std::ifstream &inFile) {
     int fileIndex = 0;
     int previousHeaderOffset = -1;
     int headerOffset = 0;
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 20; i++) {
         headerOffset = findNextHeader(inFile, headerOffset);
         std::cout << std::hex << headerOffset << std::dec << std::endl;
         if (headerOffset != -1 && previousHeaderOffset != -1) {
             std::ostringstream outFilename;
             outFilename << "./output/file-" << std::setfill('0') << std::setw(6) << fileIndex << "-" << headerOffset << ".wav";
-            extractFile(inFile, outFilename.str().c_str(), previousHeaderOffset, headerOffset - 1);
+            extractFile(inFile, outFilename.str().c_str(), previousHeaderOffset, headerOffset - previousHeaderOffset - 1);
         }
         previousHeaderOffset = headerOffset;
         headerOffset++;
+        fileIndex++;
     }
 
 
