@@ -1,6 +1,7 @@
 **/.DS_Store
 **/*.dSYM
 barbie_extract
+rle_test
 pinames.*
 output/*.wav
 *.wav
