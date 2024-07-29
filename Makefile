@@ -1,13 +1,16 @@
 all: barbie_extract rle_test
 
 barbie_extract: barbie_extract.cpp pinames.hug
-	g++ -g -o barbie_extract barbie_extract.cpp
+	g++ -g -o $@ barbie_extract.cpp
 
 iterate: barbie_extract
 	./barbie_extract
 
 rle_test: rle_test.cpp
-	g++ -g -o rle_test rle_test.cpp
+	g++ -g -o $@ rle_test.cpp
+
+analyze: analyze.cpp
+	g++ -g --std=c++11 -o $@ analyze.cpp
 
 # Extract from the first WAV header to the next one.
 .PHONY: test.wav
@@ -27,5 +30,5 @@ codecs.txt:
 
 .PHONY: clean
 clean:
-	rm -f barbie_extract rle_test output/*.wav
+	rm -f barbie_extract rle_test analyze output/*.wav
 

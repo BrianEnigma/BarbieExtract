@@ -2,6 +2,7 @@
 **/*.dSYM
 barbie_extract
 rle_test
+analyze
 pinames.*
 output/*.wav
 *.wav
