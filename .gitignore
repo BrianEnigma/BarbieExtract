@@ -6,3 +6,6 @@ pinames.*
 output/*.wav
 *.wav
 test.bin
+codecs.txt
+codec_names.txt
+reencodes/

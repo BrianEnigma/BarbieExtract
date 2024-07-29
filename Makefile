@@ -19,6 +19,12 @@ test.wav: pinames.hug
 test.bin: pinames.hug
 	dd if=pinames.hug bs=1 skip=60 count=9091 of=test.bin
 
+codecs.txt:
+	ffmpeg -codecs | grep '^ D.A' > codecs.txt
+	# blinkaudio is broken and goes into an endless loop
+	cat codecs.txt| cut -d ' ' -f 3 | grep -v binkaudio_rdft > codec_names.txt
+
+
 .PHONY: clean
 clean:
 	rm -f barbie_extract rle_test output/*.wav
