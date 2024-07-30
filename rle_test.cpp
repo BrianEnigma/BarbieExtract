@@ -1,4 +1,5 @@
 #include <fstream>
+#include <iostream>
 
 // <len><char> -- wash, rinse, repeat.
 void rleNaive(const char *inputFilename, const char *outputFilename) {
@@ -45,9 +46,43 @@ void rleMagic00(const char *inputFilename, const char *outputFilename) {
             if (ch == 0) {
                 outFile.put(0);
             } else {
+                char rle = ch;
+                inFile.get(ch);
+                for (int i = 0; i < (unsigned char) rle; i++) {
+                    outFile.put(ch);
+                }
+            }
+        } else {
+            outFile.put(ch);
+        }
+    }
+    inFile.close();
+    outFile.close();
+}
+
+// Assume 0x00 is a magic sentinel value.
+// Assume 0x00 <char> <len> is an RLE directive.
+// Assume 0x00 0x00 is just a plain 0x00.
+void rleMagic00Alt(const char *inputFilename, const char *outputFilename) {
+    std::ifstream inFile(inputFilename, std::ios::binary | std::ios::in);
+    std::ofstream outFile(outputFilename, std::ios::binary | std::ios::out);
+
+    // Copy header
+    char buffer[44] = {0};
+    inFile.read(buffer, sizeof(buffer));
+    outFile.write(buffer, sizeof(buffer));
+
+    // Attempt RLE
+    while (inFile.good()) {
+        char ch = 0;
+        inFile.get(ch);
+        if (ch == 0) {
+            inFile.get(ch);
+            if (ch == 0) {
+                outFile.put(0);
+            } else {
                 char rle = 0;
                 inFile.get(rle);
-                inFile.get(ch);
                 for (int i = 0; i < (unsigned char) rle; i++) {
                     outFile.put(ch);
                 }
@@ -81,9 +116,7 @@ void rleOnly00(const char *inputFilename, const char *outputFilename) {
             if (ch == 0) {
                 outFile.put(0);
             } else {
-                char rle = 0;
-                inFile.get(rle);
-                for (int i = 0; i < (unsigned char) rle; i++) {
+                for (int i = 0; i < (unsigned char) ch; i++) {
                     outFile.put(0);
                 }
             }
@@ -186,11 +219,14 @@ void fourBitToEightBitRle(const char *inputFilename, const char *outputFilename)
 }
 
 int main(int argc, char **argv) {
-    rleNaive("output/file-000003-54252.wav", "rletest1.wav");
-    rleMagic00("output/file-000003-54252.wav", "rletest2.wav");
-    rleOnly00("output/file-000003-54252.wav", "rletest3.wav");
-    rleZerosOnly("output/file-000003-54252.wav", "rletest4.wav");
-    fourBitToEightBit("output/file-000003-54252.wav", "rletest5.wav");
-    fourBitToEightBitRle("output/file-000003-54252.wav", "rletest6.wav");
+    //const char *inputFilename = "output/file-000003-54252.wav";
+    const char *inputFilename = "test.wav";
+    rleNaive(inputFilename, "rletest1.wav");
+    rleMagic00(inputFilename, "rletest2.wav");
+    rleMagic00Alt(inputFilename, "rletest3.wav");
+    rleOnly00(inputFilename, "rletest4.wav");
+    rleZerosOnly(inputFilename, "rletest5.wav");
+    fourBitToEightBit(inputFilename, "rletest6.wav");
+    fourBitToEightBitRle(inputFilename, "rletest7.wav");
     return 0;
 }
