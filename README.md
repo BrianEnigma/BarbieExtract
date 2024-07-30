@@ -12,8 +12,11 @@ Prototyping some extraction code... extracts some files that are ALMOST audible 
 These are needed. Remove the prefix so they are just `pinames.*`.
 
 - pinames.hug: <https://archive.org/download/BarbieDetective2VacationMystery/23466.iso/DATA%2Fpinames.hug>
+    - This is a concatenated list of WAV files of all the spoken names. The WAV headers indicate file lengths that are actually longer than the given data, leading to thoughts on compression.
 - pinames.hix: <https://archive.org/download/BarbieDetective2VacationMystery/23466.iso/DATA%2Fpinames.hix>
+    - Assumption: This appears to be a map from name to offset in the `hug` file. (TODO: check binary between names, fact-check this.)
 - pinames.lst: <https://archive.org/download/BarbieDetective2VacationMystery/23466.iso/DATA%2Fpinames.lst>
+    - Assumption: This appears to be a synonyms file, matching up alternate spellings of the same name.
 
 ## Weirdness
 
