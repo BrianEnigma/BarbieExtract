@@ -7,7 +7,7 @@
 #include <unistd.h>
 
 #define DEBUG_SEEK false
-#define DEBUG_COPY true
+#define DEBUG_COPY false
 
 const std::string INPUT_FILE = "pinames.hug";
 
@@ -40,7 +40,6 @@ int findNextHeader(std::ifstream &inFile, int currentOffset) {
                 currentOffset += sizeof(buffer) - 4; // minus four in case the buffer lands in the middle of a header string
                 break;
             }
-            //std::cout << "ptr:" << ptr << std::endl;
             // Don't look outside the buffer. If it's toward the end of the buffer, we'll find it next loop.
             if (ptr - &buffer[0] < sizeof(buffer) - 4) {
                 if (*(ptr + 1) == 'I' && *(ptr + 2) == 'F' && *(ptr + 3) == 'F') {
@@ -63,8 +62,7 @@ int findNextHeader(std::ifstream &inFile, int currentOffset) {
 }
 
 void extractFile(std::ifstream &inFile, const char *filename, size_t offset, size_t length) {
-    if (DEBUG_COPY)
-        std::cout << "Copying from 0x" << std::hex << offset << std::dec << ", length " << length << std::endl;
+    std::cout << "Copying from 0x" << std::hex << offset << std::dec << ", length " << length << std::endl;
     std::ofstream outFile(filename, std::ios::binary | std::ios::out);
     inFile.seekg(offset);
     while (length > 0) {
@@ -82,12 +80,13 @@ void extractFiles(std::ifstream &inFile) {
     int fileIndex = 0;
     int previousHeaderOffset = -1;
     int headerOffset = 0;
-    for (int i = 0; i < 20; i++) {
+    for (int i = 0; i < 50; i++) {
         headerOffset = findNextHeader(inFile, headerOffset);
-        std::cout << std::hex << headerOffset << std::dec << std::endl;
+        if (DEBUG_COPY)
+            std::cout << std::hex << headerOffset << std::dec << std::endl;
         if (headerOffset != -1 && previousHeaderOffset != -1) {
             std::ostringstream outFilename;
-            outFilename << "./output/file-" << std::setfill('0') << std::setw(6) << fileIndex << "-" << headerOffset << ".wav";
+            outFilename << "./output/file-" << std::setfill('0') << std::setw(6) << fileIndex << "-" << previousHeaderOffset << ".wav";
             extractFile(inFile, outFilename.str().c_str(), previousHeaderOffset, headerOffset - previousHeaderOffset - 1);
         }
         previousHeaderOffset = headerOffset;
