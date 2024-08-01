@@ -184,6 +184,26 @@ void fourBitToEightBit(const char *inputFilename, const char *outputFilename) {
     outFile.close();
 }
 
+// Assume each 8-bit sample is really two 4-bit samples. Separate them and double each one to get the full 8-bit swing.
+void fourBitToEightBitAlt(const char *inputFilename, const char *outputFilename) {
+    std::ifstream inFile(inputFilename, std::ios::binary | std::ios::in);
+    std::ofstream outFile(outputFilename, std::ios::binary | std::ios::out);
+
+    // Copy header
+    char buffer[44] = {0};
+    inFile.read(buffer, sizeof(buffer));
+    outFile.write(buffer, sizeof(buffer));
+
+    while (inFile.good()) {
+        char ch = 0;
+        inFile.get(ch);
+        outFile.put((ch & 0x0F) * 2);
+        outFile.put((ch >> 4) * 2);
+    }
+    inFile.close();
+    outFile.close();
+}
+
 void fourBitToEightBitRle(const char *inputFilename, const char *outputFilename) {
     std::ifstream inFile(inputFilename, std::ios::binary | std::ios::in);
     std::ofstream outFile(outputFilename, std::ios::binary | std::ios::out);
@@ -218,15 +238,48 @@ void fourBitToEightBitRle(const char *inputFilename, const char *outputFilename)
     outFile.close();
 }
 
+// Assume 0x00 is a magic sentinel value.
+// Assume 0x00 <char> <len> is an RLE directive.
+// Assume 0x00 0x00 is not an escape sequence. It's repeat 0x00 by the next byte's length.
+void rleMagic00NoEscapes(const char *inputFilename, const char *outputFilename) {
+    std::ifstream inFile(inputFilename, std::ios::binary | std::ios::in);
+    std::ofstream outFile(outputFilename, std::ios::binary | std::ios::out);
+
+    // Copy header
+    char buffer[44] = {0};
+    inFile.read(buffer, sizeof(buffer));
+    outFile.write(buffer, sizeof(buffer));
+
+    // Attempt RLE
+    while (inFile.good()) {
+        char ch = 0;
+        inFile.get(ch);
+        if (ch == 0) {
+            inFile.get(ch);
+            char rle = 0;
+            inFile.get(rle);
+            for (int i = 0; i < (unsigned char) rle; i++) {
+                outFile.put(ch);
+            }
+        } else {
+            outFile.put(ch);
+        }
+    }
+    inFile.close();
+    outFile.close();
+}
+
 int main(int argc, char **argv) {
-    //const char *inputFilename = "output/file-000003-54252.wav";
+    //const char *inputFilename = "output/file-000003-18143.wav";
     const char *inputFilename = "test.wav";
-    rleNaive(inputFilename, "rletest1.wav");
-    rleMagic00(inputFilename, "rletest2.wav");
-    rleMagic00Alt(inputFilename, "rletest3.wav");
-    rleOnly00(inputFilename, "rletest4.wav");
-    rleZerosOnly(inputFilename, "rletest5.wav");
-    fourBitToEightBit(inputFilename, "rletest6.wav");
-    fourBitToEightBitRle(inputFilename, "rletest7.wav");
+    rleNaive(inputFilename,                 "rletest1.wav");
+    rleMagic00(inputFilename,               "rletest2.wav");
+    rleMagic00Alt(inputFilename,            "rletest3.wav");
+    rleOnly00(inputFilename,                "rletest4.wav");
+    rleZerosOnly(inputFilename,             "rletest5.wav");
+    fourBitToEightBit(inputFilename,        "rletest6.wav");
+    fourBitToEightBitAlt(inputFilename,     "rletest7.wav");
+    fourBitToEightBitRle(inputFilename,     "rletest8.wav");
+    rleMagic00NoEscapes(inputFilename,      "rletest9.wav");
     return 0;
 }

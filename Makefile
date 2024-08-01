@@ -1,4 +1,4 @@
-all: barbie_extract rle_test
+all: barbie_extract rle_test analyze
 
 barbie_extract: barbie_extract.cpp pinames.hug
 	g++ -g -o $@ barbie_extract.cpp
