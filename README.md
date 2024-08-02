@@ -2,6 +2,8 @@
 
 Prototyping some extraction code... extracts some files that are ALMOST audible wav voices, but there's a lot of static.
 
+More information and background at this blog post: <https://netninja.com/2024/08/01/the-mystery-of-detective-barbies-audio/>
+
 ## References
 
 - [TikTok](https://www.tiktok.com/t/ZTNQ1jY9S/)
