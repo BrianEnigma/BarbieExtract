@@ -26,7 +26,7 @@ These are needed. The `make download` Makefile target will download them for you
 - pinames.lst: <https://archive.org/download/BarbieDetective2VacationMystery/23466.iso/DATA%2Fpinames.lst>
     - The assumption is that the `lst` file is an artifact of authoring tools and is unused by the game itself. It lists the 9,342 canonical names.
 
-## Extracting
+## Extracting Audio
 
 With much thanks to [Alistair](https://github.com/ali1234), who posted a Python script to the [GitHub issue](https://github.com/BrianEnigma/BarbieExtract/issues/1), we now have `barbie.py` that can successfully extract *AND* decompress the WAV files from the `hug` archive.
 
@@ -53,6 +53,8 @@ Extract all of the wav files:
 ```
 ./barbie.py dump
 ```
+
+These fils all appear in the `./out/` folder.
 
 ## Weirdness In The Files
 
