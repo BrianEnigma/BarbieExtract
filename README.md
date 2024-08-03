@@ -146,7 +146,7 @@ for (...)
 
 ### WAV Compression
 
-Once the WAV file is extracted, decompression has to happen on the `data` section of samples. The compressed data is in 4-bit chunks, with 0xf being a special escape code that controls how subsequent chunks are decoded.
+Once the WAV file is extracted, decompression has to happen on the `data` section of samples. The compressed data is in 4-bit chunks, with 0xf being a special escape code that controls how subsequent chunks are decoded. (Specifics TBD.)
 
 ## Makefile Targets
 
