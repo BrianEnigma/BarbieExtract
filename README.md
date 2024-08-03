@@ -71,7 +71,82 @@ These fils all appear in the `./out/` folder.
 
 ## File Formats
 
-(to be here)
+### pinames.hix
+
+This is a list of every name the game is aware of. This includes all spellings/homonyms. Each entry (spelling) points to a WAV within the `hug` file. Multiple entries can point to the same WAV, which is how we get the alternate-spellings/homonyms. It consists of three main sections. Everything is little endian, because — come on — this is a 90s game running on Intel processors.
+
+```
+table_length : 32 bits
+for (i = 0; i < table_length; i++)
+    letter_1 : 8 bits
+    letter_2 : 8 bits
+for (i = 0; i < table_length; i++)
+    hix_file_offset : 32 bits
+    tbd : 32 bits
+for (...)
+    players_name : 24 BYTES
+    hug_offset : 32 bits
+```
+
+- `table_length` is the number of entries in the first and second tables
+- Table 1:
+    - `letter_1` and `letter_2` are the first two letters (characters, actually) of the player's name. This is a list such as `a'` (a apostrophe, for names like “A'leeshana”), `aa`, `ab`, `ac`, and so on. This is used so that, as the player types their name, the software can quickly index into the list of names, staring at names that begin with those two letters.
+- Table 2:
+    - Based on the index of where `letter_1` and `letter_2` are found in the first table, you jump to the same index in this second table.
+    - `hix_file_offset` is the byte offset, within this very same file, where names staring with those two letters begin.
+    - `tbd` (unknown)
+- Table 3:
+    - `players_name` is a null-terminated string for the player's name.
+    - `hug_offset` is the byte offset, within the `pinames.hug` (concatenated WAV archive) of where to find audio that corresponds with that name.
+
+### pinames.hug
+
+This is where all of the raw audio lives.
+
+```
+0x0000 ... 0x0x23AF is header content of some sort.
+0x23B0 is where the name content starts
+for (...)
+    entry_prefix : 16 BYTES
+    wav_header_length : 32 bits
+    // From here down to the compressed data is the standard WAV header.
+    riff_marker : 32 bits
+    file_size : 32 bits
+    wave_marker : 32 bits
+    fmt_marker : 32 bits
+    fmt_length: 32 bits
+    format_enum : 16 bits
+    channel_count : 16 bits
+    sample_rate : 32 bits
+    sample_calc1 : 32 bits
+    sample_calc2 : 16 bits
+    bits_per_sample : 16 bits
+    data_marker : 32 bits
+    data_length: 32 bits
+    // Compressed data starts here.
+    for (...)
+        data_byte : 8 bit
+```
+
+- `entry_prefix` is the literal {0x00, 0x01, 0xFF, 0x03, 0xFD, 0x06, 0xFA, 0x0A, 0xF6, 0x0F, 0xF1, 0x15, 0xEB, 0x1C, 0xE4, 0x7F}. Likely, it serves as a magic prefix to ensure that the offset jump was correct?
+- `wav_header_length` is the literal 0x2C (the length of a standard WAV header)
+- `riff_marker` is the literal string RIFF.
+- `file_size` is the size the WAV file _WOULD_ be, when uncompressed.
+- `wave_marker` is the literal string `WAVE`.
+- `fmt_marker` is the literal string `fmt `.
+- `fmt_length` is the literal value 0x10 (the previous 16 bytes)
+- `format_enum` is the literal 0x01 (PCM)
+- `channel_count` is the literal 0x01 (mono)
+- `sample_rate` is the literal 22,050
+- `sample_calc1` is (Sample Rate * BitsPerSample * Channels) / 8, which is the literal 22,050 again.
+- `sample_calc2` is another calculation, but the 0x01 in this case.
+- `bits_per_sample` is the literal 0x08 (but this is a lie)
+- `data_marker` is the literal `data`
+- `data_length` is the the size the data section _WOULD_ be, when uncompressed.
+
+### WAV Compression
+
+Once the WAV file is extracted, decompression has to happen on the `data` section of samples. The compressed data is in 4-bit chunks, with 0xf being a special escape code that controls how subsequent chunks are decoded.
 
 ## Makefile Targets
 
