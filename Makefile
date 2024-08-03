@@ -1,4 +1,4 @@
-all: barbie_extract rle_test analyze
+all: downloads barbie_extract rle_test analyze
 
 barbie_extract: barbie_extract.cpp pinames.hug
 	g++ -g -o $@ barbie_extract.cpp
@@ -27,6 +27,13 @@ codecs.txt:
 	# blinkaudio is broken and goes into an endless loop
 	cat codecs.txt| cut -d ' ' -f 3 | grep -v binkaudio_rdft > codec_names.txt
 
+downloads: pinames.hix pinames.hug pinames.lst
+pinames.hix:
+	wget -O $@ "https://archive.org/download/BarbieDetective2VacationMystery/23466.iso/DATA%2Fpinames.hix"
+pinames.hug:
+	wget -O $@ "https://archive.org/download/BarbieDetective2VacationMystery/23466.iso/DATA%2Fpinames.hug"
+pinames.lst:
+	wget -O $@ "https://archive.org/download/BarbieDetective2VacationMystery/23466.iso/DATA%2Fpinames.lst"
 
 .PHONY: clean
 clean:
