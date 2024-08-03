@@ -26,19 +26,6 @@ These are needed. The `make download` Makefile target will download them for you
 - pinames.lst: <https://archive.org/download/BarbieDetective2VacationMystery/23466.iso/DATA%2Fpinames.lst>
     - The assumption is that the `lst` file is an artifact of authoring tools and is unused by the game itself. It lists the 9,342 canonical names.
 
-## Weirdness In The Files
-
-- The `hug` file appears to be a bunch of WAV files concatenated together. This would match with how I'd put something like this together using 1999 technology. The name index files would point to offsets and lengths within the audio archive, and you'd just play out that chunk of file, without having to worry about first decompressing the whole thing.
-- The first audio file extracted is `output/file-000001-9156.wav`
-- The make target `test.wav` also extracts the same, but using the `dd` command.
-- The weird thing about this first file is that actual file size is `9135`, but the wav header within the file proclaims that the length should be `19682`. Other interesting things in the header:
-    - PCM format
-    - Single channel (mono)
-    - Sample rate 22,050
-    - 8 bits per sample
-- Based on these headers, the file should be 0.9 seconds long, but it's really 0.4 seconds long, due to the truncation.
-- Some of them are _almost_ listenable. You can make out some vocalization, inflection, and diction in there behind varying amounts of digital noise.
-
 ## Extracting
 
 With much thanks to [Alistair](https://github.com/ali1234), who posted a Python script to the [GitHub issue](https://github.com/BrianEnigma/BarbieExtract/issues/1), we now have `barbie.py` that can successfully extract *AND* decompress the WAV files from the `hug` archive.
@@ -66,6 +53,19 @@ Extract all of the wav files:
 ```
 ./barbie.py dump
 ```
+
+## Weirdness In The Files
+
+- The `hug` file appears to be a bunch of WAV files concatenated together. This would match with how I'd put something like this together using 1999 technology. The name index files would point to offsets and lengths within the audio archive, and you'd just play out that chunk of file, without having to worry about first decompressing the whole thing.
+- The first audio file extracted is `output/file-000001-9156.wav`
+- The make target `test.wav` also extracts the same, but using the `dd` command.
+- The weird thing about this first file is that actual file size is `9135`, but the wav header within the file proclaims that the length should be `19682`. Other interesting things in the header:
+    - PCM format
+    - Single channel (mono)
+    - Sample rate 22,050
+    - 8 bits per sample
+- Based on these headers, the file should be 0.9 seconds long, but it's really 0.4 seconds long, due to the truncation.
+- Some of them are _almost_ listenable. You can make out some vocalization, inflection, and diction in there behind varying amounts of digital noise.
 
 ## File Formats
 
